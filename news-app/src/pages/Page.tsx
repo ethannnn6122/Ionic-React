@@ -12,26 +12,36 @@ import {
   IonPage,
   IonButtons,
   IonMenuButton,
-  IonFooter
+  IonFooter,
+  IonRefresher,
+  IonRefresherContent
 } from '@ionic/react';
 import React from 'react';
 import './Page.css';
 import axios from 'axios';
 import { RouteComponentProps } from 'react-router';
+import { RefresherEventDetail } from '@ionic/core';
 
 const API_KEY = '104e1e62108f4adb8f9991d5f0da0cca';
-const endpoint = `https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=${API_KEY}`;
+const endpoint = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`;
 
-const sendGetRequest = () => {
+const sendGetRequest = async () => {
   
-  return axios({
+  const response = await axios({
     url: endpoint,
     method: 'get'
-  }).then(response => {
+  });
+  console.log(response);
+  return response.data;
+};
 
-    console.log(response);
-    return response.data;
-  })
+const doRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+  console.log('Begin async operation');
+  setTimeout(() => {
+    console.log('Async operation has ended');
+    sendGetRequest();
+    event.detail.complete();
+  }, 2000);
 };
 
 const Page: React.FC<RouteComponentProps<{ name: string; }>> = ({ match }) => {
@@ -59,6 +69,9 @@ const Page: React.FC<RouteComponentProps<{ name: string; }>> = ({ match }) => {
             <IonTitle size="large">{ match.params.name }</IonTitle>
           </IonToolbar>
         </IonHeader>
+        <IonRefresher slot="fixed" onIonRefresh={doRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
           {items.map((item, index) => {
             return(
               <IonCard key={index}>
