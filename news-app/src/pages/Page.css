@@ -1,0 +1,7 @@
+ion-content ion-toolbar {
+  --background: transparent;
+}
+
+ion-footer {
+  padding: 1em;
+}
